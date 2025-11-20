@@ -1,0 +1,21 @@
+# MongoDB Setup Instructions
+
+1. Tạo file .env.local trong thư mục gốc của project
+
+2. Thêm các biến môi trường sau:
+
+# MongoDB Connection String
+# Local MongoDB:
+MONGODB_URI=mongodb://localhost:27017
+
+# Hoặc MongoDB Atlas (cloud):
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/
+
+# Optional: Database name (mặc định là "download-video")
+MONGODB_DB_NAME=download-video
+
+3. Khởi động MongoDB:
+   - Local: Đảm bảo MongoDB đang chạy trên localhost:27017
+   - Atlas: Sử dụng connection string từ MongoDB Atlas dashboard
+
+4. Khởi động lại Next.js server để áp dụng thay đổi

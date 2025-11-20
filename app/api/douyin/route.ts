@@ -1,5 +1,6 @@
 import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
+import { getCachedVideo, saveVideoToCache } from "@/models/video";
 
 const DOUYIN_DETAIL_ENDPOINTS = [
   "https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?aweme_id=",
@@ -50,7 +51,7 @@ type AwemeDetail = {
 };
 
 type DouyinPayload = {
-  awemeId: string;
+  videoId: string;
   description: string;
   author: string;
   avatar?: string;
@@ -63,6 +64,7 @@ type DouyinPayload = {
   publishedAt?: string;
   noWatermarkUrl: string;
   proxyDownload: string;
+  platform: "douyin";
 };
 
 type TikwmResponse = {
@@ -111,6 +113,15 @@ export async function POST(request: Request) {
       "->",
       normalizedUrl
     );
+
+    // Check cache first
+    const cached = await getCachedVideo(normalizedUrl, "douyin");
+    if (cached) {
+      console.info(`[Douyin:${debugTag}] Cache hit for ${normalizedUrl}`);
+      return NextResponse.json({ success: true, data: cached, cached: true });
+    }
+    console.info(`[Douyin:${debugTag}] Cache miss, analyzing...`);
+
     const { awemeId } = await resolveAwemeId(normalizedUrl, debugTag);
     console.info(`[Douyin:${debugTag}] Resolved awemeId`, awemeId);
 
@@ -154,7 +165,11 @@ export async function POST(request: Request) {
       throw new Error("Không thể xử lý video Douyin.");
     }
 
-    return NextResponse.json({ success: true, data: payload });
+    // Save to cache
+    await saveVideoToCache(normalizedUrl, "douyin", payload);
+    console.info(`[Douyin:${debugTag}] Saved to cache: ${awemeId}`);
+
+    return NextResponse.json({ success: true, data: payload, cached: false });
   } catch (error) {
     console.error(`[Douyin API][${debugTag}] error:`, error);
     return NextResponse.json(
@@ -327,7 +342,7 @@ function buildPayload(aweme: AwemeDetail, awemeId: string): DouyinPayload {
   const sanitizedUrl = sanitizeVideoUrl(candidateUrl);
 
   return {
-    awemeId,
+    videoId: awemeId,
     description: aweme.desc ?? "",
     author: aweme.author?.nickname ?? "Không rõ",
     avatar: aweme.author?.avatar_thumb?.url_list?.[0],
@@ -353,6 +368,7 @@ function buildPayload(aweme: AwemeDetail, awemeId: string): DouyinPayload {
     proxyDownload: `/api/douyin/download?source=${encodeURIComponent(
       sanitizedUrl
     )}&filename=${awemeId}.mp4`,
+    platform: "douyin",
   };
 }
 
@@ -435,7 +451,7 @@ function buildPayloadFromTikwm(
       : undefined;
 
   return {
-    awemeId,
+    videoId: awemeId,
     description: data?.title ?? "",
     author: authorName,
     avatar: authorAvatar,
@@ -452,6 +468,7 @@ function buildPayloadFromTikwm(
     proxyDownload: `/api/douyin/download?source=${encodeURIComponent(
       videoUrl
     )}&filename=${awemeId}.mp4`,
+    platform: "douyin",
   };
 }
 
