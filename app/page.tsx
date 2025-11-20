@@ -312,9 +312,9 @@ export default function Home() {
   return (
     <div className="relative isolate h-screen overflow-hidden bg-slate-950 text-white">
       <div className="pointer-events-none absolute inset-0 opacity-70">
-        <div className="absolute -top-40 left-1/2 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-fuchsia-600/30 blur-[150px]" />
-        <div className="absolute bottom-0 left-0 h-[28rem] w-[28rem] rounded-full bg-teal-500/20 blur-[160px]" />
-        <div className="absolute right-0 top-1/3 h-[22rem] w-[22rem] rounded-full bg-indigo-600/20 blur-[120px]" />
+        <div className="absolute -top-40 left-1/2 h-128 w-lg -translate-x-1/2 rounded-full bg-fuchsia-600/30 blur-[150px]" />
+        <div className="absolute bottom-0 left-0 h-112 w-md rounded-full bg-teal-500/20 blur-[160px]" />
+        <div className="absolute right-0 top-1/3 h-88 w-88 rounded-full bg-indigo-600/20 blur-[120px]" />
       </div>
 
       <div className="relative z-10 grid h-full grid-cols-10">
@@ -330,7 +330,7 @@ export default function Home() {
           <div className="space-y-4">
             <h1 className="text-4xl font-semibold leading-tight text-slate-50 sm:text-5xl lg:text-6xl">
               Tải video Douyin{" "}
-              <span className={`bg-gradient-to-r ${ACCENT_GRADIENT} bg-clip-text text-transparent`}>
+              <span className={`bg-linear-to-r ${ACCENT_GRADIENT} bg-clip-text text-transparent`}>
                 chất lượng tối đa
               </span>{" "}
               trong vài giây.
@@ -421,12 +421,12 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={status === "loading"}
-                  className={`group relative mt-4 inline-flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-r ${ACCENT_GRADIENT} px-8 py-4 text-lg font-semibold text-slate-950 shadow-[0_20px_80px_-30px_rgba(236,72,153,0.9)] transition focus:outline-none disabled:cursor-not-allowed disabled:opacity-70`}
+                  className={`group relative mt-4 inline-flex items-center justify-center overflow-hidden rounded-2xl bg-linear-to-r ${ACCENT_GRADIENT} px-8 py-4 text-lg font-semibold text-white shadow-[0_20px_80px_-30px_rgba(236,72,153,0.9)] transition focus:outline-none disabled:cursor-not-allowed disabled:opacity-70`}
                 >
                   <span className="flex items-center gap-3">
                     {status === "loading" ? (
                       <>
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900 border-t-transparent" />
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900 border-t-transparent text-white" />
                         Đang xử lý...
                       </>
                     ) : (
@@ -436,7 +436,7 @@ export default function Home() {
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 24 24"
                           fill="currentColor"
-                          className="h-5 w-5 transition group-hover:translate-x-1"
+                          className="h-5 w-5 transition group-hover:translate-x-1 text-white"
                         >
                           <path d="M12 3v12.586l3.293-3.293 1.414 1.414L12 18.414l-4.707-4.707 1.414-1.414L11 15.586V3h2z" />
                           <path d="M5 20h14v2H5z" />
@@ -450,7 +450,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-1">
-            <div className="rounded-[22px] border border-white/10 bg-gradient-to-br from-white/10 to-transparent p-6 text-sm text-white/80 shadow-[0_20px_80px_-40px_rgba(15,23,42,1)] backdrop-blur">
+            <div className="rounded-[22px] border border-white/10 bg-linear-to-br from-white/10 to-transparent p-6 text-sm text-white/80 shadow-[0_20px_80px_-40px_rgba(15,23,42,1)] backdrop-blur">
               <h3 className="text-base font-semibold text-white">
                 Vì sao Douyin Supreme khác biệt?
               </h3>
@@ -585,7 +585,7 @@ export default function Home() {
       {result && !isDrawerOpen && (
         <button
           onClick={() => setIsDrawerOpen(true)}
-          className="fixed bottom-6 right-6 z-30 flex items-center gap-3 rounded-full border border-white/20 bg-gradient-to-r from-fuchsia-500/90 to-rose-500/90 px-5 py-3 text-white shadow-lg backdrop-blur transition-all hover:scale-105 hover:shadow-xl active:scale-95"
+          className="fixed bottom-6 right-6 z-30 flex items-center gap-3 rounded-full border border-white/20 bg-linear-to-r from-fuchsia-500/90 to-rose-500/90 px-5 py-3 text-white shadow-lg backdrop-blur transition-all hover:scale-105 hover:shadow-xl active:scale-95"
           aria-label="Xem kết quả phân tích"
         >
           <svg
@@ -689,13 +689,13 @@ function extractShareUrl(value: string) {
 
 function LinkGuideCanvas() {
   return (
-    <div className="relative overflow-hidden rounded-[32px] border border-white/15 bg-gradient-to-br from-fuchsia-500/20 via-indigo-600/10 to-black/90 p-8 shadow-[0_25px_100px_-40px_rgba(13,148,136,1)]">
+    <div className="relative overflow-hidden rounded-[32px] border border-white/15 bg-linear-to-br from-fuchsia-500/20 via-indigo-600/10 to-black/90 p-8 shadow-[0_25px_100px_-40px_rgba(13,148,136,1)]">
       <div className="absolute inset-x-10 top-10 h-52 rounded-full bg-amber-400/10 blur-3xl" />
       <div className="relative mx-auto flex max-w-md flex-col gap-6">
         <div className="mx-auto h-80 w-44 rounded-[38px] border border-white/20 bg-black/60 p-3 text-white/80 backdrop-blur">
           <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-white/20" />
           <div className="space-y-3">
-            <div className="h-32 rounded-2xl bg-gradient-to-br from-slate-500 via-white/20 to-slate-900" />
+            <div className="h-32 rounded-2xl bg-linear-to-br from-slate-500 via-white/20 to-slate-900" />
             <div className="space-y-2">
               <div className="h-3 w-32 rounded-full bg-white/20" />
               <div className="h-3 w-28 rounded-full bg-white/10" />
@@ -795,11 +795,11 @@ function AnalysisDrawer({
       
       {/* Drawer */}
       <div
-        className={`fixed right-0 top-0 z-50 h-screen w-full max-w-2xl transform flex flex-col border-l border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-black shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`fixed right-0 top-0 z-50 h-screen w-full max-w-2xl transform flex flex-col border-l border-white/10 bg-linear-to-br from-slate-950 via-slate-900 to-black shadow-2xl transition-transform duration-500 ease-in-out
           isAnimating ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex-shrink-0 flex items-center justify-between border-b border-white/10 bg-black/80 px-6 py-4 backdrop-blur">
+        <div className="shrink-0 flex items-center justify-between border-b border-white/10 bg-black/80 px-6 py-4 backdrop-blur">
           <div className="min-w-0 flex-1 pr-4">
             <p className="text-sm uppercase tracking-[0.3em] text-white/60 truncate">
               Kết quả phân tích
@@ -810,7 +810,7 @@ function AnalysisDrawer({
           </div>
           <button
             onClick={onClose}
-            className="flex-shrink-0 rounded-full border border-white/20 bg-white/5 p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
+            className="shrink-0 rounded-full border border-white/20 bg-white/5 p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
             aria-label="Đóng drawer"
           >
             <svg
@@ -832,7 +832,7 @@ function AnalysisDrawer({
           isAnimating ? "opacity-100" : "opacity-0"
         }`}>
           {/* Video Info */}
-          <div className={`flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-500 delay-150 ${
+          <div className={`shrink-0 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-500 delay-150 ${
             isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}>
             <p className="text-xs text-white/70 mb-3 truncate">
@@ -876,13 +876,13 @@ function AnalysisDrawer({
           </div>
 
           {/* Download Button */}
-          <div className={`flex-shrink-0 space-y-2 transition-all duration-500 delay-300 ${
+          <div className={`shrink-0 space-y-2 transition-all duration-500 delay-300 ${
             isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}>
             <a
               href={result.proxyDownload}
               download={`${result.platform}-${result.videoId}.mp4`}
-              className={`inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-gradient-to-r ${ACCENT_GRADIENT} px-5 py-3 text-base font-semibold text-slate-900 transition hover:opacity-90 shadow-lg`}
+              className={`inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-linear-to-r ${ACCENT_GRADIENT} px-5 py-3 text-base font-semibold text-slate-900 transition hover:opacity-90 shadow-lg`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -931,8 +931,9 @@ function HistorySidebarCard({
     >
       <div className="flex gap-3">
         {/* Thumbnail */}
-        <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-white/10">
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-white/10">
           {result.cover ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={result.cover}
               alt={result.description}
@@ -969,35 +970,35 @@ function HistorySidebarCard({
           <p className="mt-0.5 text-xs text-white/60 truncate">
             {result.author}
           </p>
-          <div className="mt-1 flex items-center gap-2 text-[10px] text-white/50">
-            <span>{formatDuration(result.duration)}</span>
-            <span>•</span>
-            <span>{formatDate(accessedAt)}</span>
+          <div className="mt-1 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-[10px] text-white/50">
+              <span>{formatDuration(result.duration)}</span>
+              <span>•</span>
+              <span>{formatDate(accessedAt)}</span>
+            </div>
+            {onDelete && (
+              <button
+                onClick={onDelete}
+                className="shrink-0 rounded-lg border border-rose-500/30 bg-rose-500/10 p-1.5 text-rose-300 transition hover:bg-rose-500/20"
+                title="Xóa"
+                aria-label="Xóa video"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-3 w-3"
+                >
+                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
-
-        {/* Actions */}
-        {onDelete && (
-          <button
-            onClick={onDelete}
-            className="flex-shrink-0 rounded-lg border border-rose-500/30 bg-rose-500/10 p-1.5 text-rose-300 transition hover:bg-rose-500/20"
-            title="Xóa"
-            aria-label="Xóa video"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-3 w-3"
-            >
-              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
-          </button>
-        )}
       </div>
     </div>
   );
@@ -1072,12 +1073,12 @@ function HistoryVideoDrawer({
         onClick={onClose}
       />
       <div
-        className={`fixed right-0 top-0 z-50 h-screen w-full max-w-2xl transform flex flex-col border-l border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-black shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`fixed right-0 top-0 z-50 h-screen w-full max-w-2xl transform flex flex-col border-l border-white/10 bg-linear-to-br from-slate-950 via-slate-900 to-black shadow-2xl transition-transform duration-500 ease-in-out ${
           isAnimating ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex h-full flex-col">
-          <div className="flex-shrink-0 flex items-center justify-between border-b border-white/10 bg-black/80 px-6 py-4 backdrop-blur">
+          <div className="shrink-0 flex items-center justify-between border-b border-white/10 bg-black/80 px-6 py-4 backdrop-blur">
             <div className="min-w-0 flex-1 pr-4">
               <p className="text-sm uppercase tracking-[0.3em] text-white/60">
                 Chi tiết video
@@ -1088,7 +1089,7 @@ function HistoryVideoDrawer({
             </div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 rounded-full border border-white/20 bg-white/5 p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
+              className="shrink-0 rounded-full border border-white/20 bg-white/5 p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
               aria-label="Đóng drawer"
             >
               <svg
@@ -1109,7 +1110,7 @@ function HistoryVideoDrawer({
           <div className={`flex-1 flex flex-col min-h-0 p-6 gap-4 overflow-hidden transition-opacity duration-500 delay-100 ${
             isAnimating ? "opacity-100" : "opacity-0"
           }`}>
-            <div className={`flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-500 delay-150 ${
+            <div className={`shrink-0 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-500 delay-150 ${
               isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}>
               <h3 className="mb-3 text-sm font-semibold text-white">
@@ -1175,13 +1176,13 @@ function HistoryVideoDrawer({
               />
             </div>
 
-            <div className={`flex-shrink-0 space-y-2 transition-all duration-500 delay-300 ${
+            <div className={`shrink-0 space-y-2 transition-all duration-500 delay-300 ${
               isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}>
               <a
                 href={result.proxyDownload}
                 download={`${result.platform}-${result.videoId}.mp4`}
-                className={`inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-gradient-to-r ${ACCENT_GRADIENT} px-5 py-3 text-base font-semibold text-slate-900 transition hover:opacity-90 shadow-lg`}
+                className={`inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-linear-to-r ${ACCENT_GRADIENT} px-5 py-3 text-base font-semibold text-slate-900 transition hover:opacity-90 shadow-lg`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

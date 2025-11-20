@@ -89,7 +89,7 @@ export function Dialog({
         }`}
       >
         <div
-          className={`relative w-full max-w-md rounded-2xl border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-black p-6 shadow-2xl transition-all duration-300 ${
+          className={`relative w-full max-w-md rounded-2xl border border-white/10 bg-linear-to-br from-slate-950 via-slate-900 to-black p-6 shadow-2xl transition-all duration-300 ${
             isAnimating
               ? "scale-100 translate-y-0"
               : "scale-95 translate-y-4"

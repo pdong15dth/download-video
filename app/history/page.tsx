@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -139,9 +140,9 @@ export default function HistoryPage() {
   return (
     <div className="relative isolate min-h-screen overflow-hidden bg-slate-950 text-white">
       <div className="pointer-events-none absolute inset-0 opacity-70">
-        <div className="absolute -top-40 left-1/2 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-fuchsia-600/30 blur-[150px]" />
-        <div className="absolute bottom-0 left-0 h-[28rem] w-[28rem] rounded-full bg-teal-500/20 blur-[160px]" />
-        <div className="absolute right-0 top-1/3 h-[22rem] w-[22rem] rounded-full bg-indigo-600/20 blur-[120px]" />
+        <div className="absolute -top-40 left-1/2 h-128 w-lg -translate-x-1/2 rounded-full bg-fuchsia-600/30 blur-[150px]" />
+        <div className="absolute bottom-0 left-0 h-128 w-lg rounded-full bg-teal-500/20 blur-[160px]" />
+        <div className="absolute right-0 top-1/3 h-128 w-lg rounded-full bg-indigo-600/20 blur-[120px]" />
       </div>
 
       <main className="relative z-10 mx-auto flex max-w-6xl flex-col gap-12 px-4 py-16 sm:px-10 lg:px-14">
@@ -150,7 +151,7 @@ export default function HistoryPage() {
           <div>
             <h1 className="text-3xl font-semibold text-slate-50 sm:text-4xl">
               Lịch sử{" "}
-              <span className={`bg-gradient-to-r ${ACCENT_GRADIENT} bg-clip-text text-transparent`}>
+              <span className={`bg-linear-to-r ${ACCENT_GRADIENT} bg-clip-text text-transparent`}>
                 Video đã tải
               </span>
             </h1>
@@ -366,7 +367,7 @@ function VideoHistoryCard({
     >
       <div className="flex gap-4">
         {/* Thumbnail */}
-        <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl border border-white/10">
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10">
           {result.cover ? (
             <img
               src={result.cover}
@@ -416,7 +417,7 @@ function VideoHistoryCard({
         </div>
 
         {/* Actions */}
-        <div className="flex flex-shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <a
             href={result.proxyDownload}
             download={`${result.platform}-${result.videoId}.mp4`}
@@ -527,13 +528,13 @@ function VideoDetailDrawer({
 
       {/* Drawer */}
       <div
-        className={`fixed right-0 top-0 z-50 h-screen w-full max-w-2xl transform flex flex-col border-l border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-black shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`fixed right-0 top-0 z-50 h-screen w-full max-w-2xl transform flex flex-col border-l border-white/10 bg-linear-to-br from-slate-950 via-slate-900 to-black shadow-2xl transition-transform duration-500 ease-in-out ${
           isAnimating ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex-shrink-0 flex items-center justify-between border-b border-white/10 bg-black/80 px-6 py-4 backdrop-blur">
+          <div className="shrink-0 flex items-center justify-between border-b border-white/10 bg-black/80 px-6 py-4 backdrop-blur">
             <div className="min-w-0 flex-1 pr-4">
               <p className="text-sm uppercase tracking-[0.3em] text-white/60">
                 Chi tiết video
@@ -545,7 +546,7 @@ function VideoDetailDrawer({
             <button
               onClick={onClose}
               aria-label="Đóng drawer"
-              className="flex-shrink-0 rounded-full border border-white/20 bg-white/5 p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
+              className="shrink-0 rounded-full border border-white/20 bg-white/5 p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -567,7 +568,7 @@ function VideoDetailDrawer({
             isAnimating ? "opacity-100" : "opacity-0"
           }`}>
             {/* Video Info */}
-            <div className={`flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-500 delay-150 ${
+            <div className={`shrink-0 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-500 delay-150 ${
               isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}>
               <h3 className="mb-3 text-sm font-semibold text-white">
@@ -636,13 +637,13 @@ function VideoDetailDrawer({
             </div>
 
             {/* Download Button */}
-            <div className={`flex-shrink-0 space-y-2 transition-all duration-500 delay-300 ${
+            <div className={`shrink-0 space-y-2 transition-all duration-500 delay-300 ${
               isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}>
               <a
                 href={result.proxyDownload}
                 download={`${result.platform}-${result.videoId}.mp4`}
-                className={`inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-gradient-to-r ${ACCENT_GRADIENT} px-5 py-3 text-base font-semibold text-slate-900 transition hover:opacity-90 shadow-lg`}
+                className={`inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-linear-to-r ${ACCENT_GRADIENT} px-5 py-3 text-base font-semibold text-slate-900 transition hover:opacity-90 shadow-lg`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
