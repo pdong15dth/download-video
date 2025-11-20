@@ -2,6 +2,9 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { Dialog } from "@/app/components/Dialog";
+import { useI18n } from "@/app/contexts/I18nContext";
+import { LanguageSwitcher } from "@/app/components/LanguageSwitcher";
+import { AnimatedText } from "@/app/components/AnimatedText";
 
 type VideoPlatform = "douyin" | "tiktok" | "facebook";
 
@@ -57,20 +60,7 @@ const SAMPLE_LINKS = [
   { url: "https://www.facebook.com/watch/?v=example", platform: "facebook" as VideoPlatform },
 ];
 
-const GUIDE_STEPS = [
-  {
-    title: "1. Mở Douyin",
-    detail: "Nhấn vào nút Chia sẻ (biểu tượng mũi tên) ở video bạn thích.",
-  },
-  {
-    title: "2. Copy Link",
-    detail: "Chọn Copy Link/复制链接 để sao chép URL video.",
-  },
-  {
-    title: "3. Dán vào ô tải",
-    detail: "Dán link vào ô bên trên rồi bấm Tải ngay.",
-  },
-];
+// GUIDE_STEPS will be created inside component to use translations
 
 const ACCENT_GRADIENT =
   "from-fuchsia-400 via-rose-500 to-amber-300 dark:from-fuchsia-400/90";
@@ -78,6 +68,7 @@ const ACCENT_GRADIENT =
 const SHARE_URL_REGEX = /https?:\/\/[^\s]+/i;
 
 export default function Home() {
+  const { t } = useI18n();
   const [link, setLink] = useState("");
   const [platform, setPlatform] = useState<VideoPlatform | null>(null);
   const [status, setStatus] = useState<FetchState>("idle");
@@ -102,13 +93,13 @@ export default function Home() {
   }>({ isOpen: false, message: "" });
 
   const sizeLabel = useMemo(() => {
-    if (!result?.sizeBytes) return "Không rõ";
+    if (!result?.sizeBytes) return t("unknown");
     const mb = result.sizeBytes / (1024 * 1024);
     if (mb > 1024) {
       return `${(mb / 1024).toFixed(2)} GB`;
     }
     return `${mb.toFixed(2)} MB`;
-  }, [result]);
+  }, [result, t]);
 
   const durationLabel = useMemo(() => {
     if (!result?.duration) return "—";
@@ -119,10 +110,10 @@ export default function Home() {
   }, [result]);
 
   const statusBadge = {
-    idle: "Sẵn sàng tải",
-    loading: "Đang phân tích...",
-    success: "Đã sẵn sàng tải về",
-    error: "Có lỗi xảy ra",
+    idle: t("statusReady"),
+    loading: t("statusAnalyzing"),
+    success: t("statusReadyToDownload"),
+    error: t("statusError"),
   }[status];
 
   function detectPlatform(url: string): VideoPlatform | null {
@@ -137,28 +128,28 @@ export default function Home() {
     const trimmed = link.trim();
     if (!trimmed) {
       setStatus("error");
-      setMessage("Vui lòng dán link Douyin trước khi tải.");
+      setMessage(t("pasteLinkFirst"));
       return;
     }
 
     const extracted = extractShareUrl(trimmed);
     if (!extracted) {
       setStatus("error");
-      setMessage("Không tìm thấy URL trong đoạn bạn dán. Thử lại nhé!");
+      setMessage(t("urlNotFound"));
       return;
     }
 
     const detectedPlatform = detectPlatform(extracted);
     if (!detectedPlatform) {
       setStatus("error");
-      setMessage("Chỉ hỗ trợ link từ Douyin, TikTok hoặc Facebook.");
+      setMessage(t("unsupportedPlatform"));
       return;
     }
 
     setPlatform(detectedPlatform);
     setStatus("loading");
     const platformName = detectedPlatform === "douyin" ? "Douyin" : detectedPlatform === "tiktok" ? "TikTok" : "Facebook";
-    setMessage(`Đang phân tích ${platformName}...`);
+    setMessage(`${t("analyzing")} ${platformName}...`);
     setResult(null);
 
     try {
@@ -172,7 +163,7 @@ export default function Home() {
       const payload = await response.json();
 
       if (!response.ok || !payload?.success) {
-        throw new Error(payload?.message ?? "Đã có lỗi không xác định.");
+        throw new Error(payload?.message ?? t("undefinedError"));
       }
 
       // Add platform to payload
@@ -180,7 +171,7 @@ export default function Home() {
       setResult(videoData as VideoPayload);
       setProcessedAt(new Date().toISOString());
       setStatus("success");
-      setMessage("Tìm thấy video chất lượng cao, không watermark!");
+      setMessage(t("foundHighQuality"));
       setIsDrawerOpen(true);
       
       // Reload history after successful analysis
@@ -191,7 +182,7 @@ export default function Home() {
       setMessage(
         error instanceof Error
           ? error.message
-          : "Không thể xử lý link này, thử lại sau nhé."
+          : t("unknownError")
       );
     }
   }
@@ -200,7 +191,7 @@ export default function Home() {
     setLink(sample.url);
     setPlatform(sample.platform);
     setStatus("idle");
-    setMessage("Dán link mẫu rồi, bấm Tải ngay nhé!");
+    setMessage(t("sampleFillMessage"));
     setProcessedAt(null);
     setResult(null);
   };
@@ -227,14 +218,14 @@ export default function Home() {
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.message || "Không thể tải lịch sử");
+        throw new Error(data.message || t("loadHistoryError"));
       }
 
       setHistory(data.data.history || []);
     } catch (err) {
       console.error("Error loading history:", err);
       setHistoryError(
-        err instanceof Error ? err.message : "Không thể tải lịch sử video"
+        err instanceof Error ? err.message : t("loadHistoryError")
       );
     } finally {
       setHistoryLoading(false);
@@ -291,7 +282,7 @@ export default function Home() {
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.message || "Không thể xóa video");
+        throw new Error(data.message || t("deleteVideoError"));
       }
 
       if (selectedHistoryVideo?._id === item._id) {
@@ -304,7 +295,7 @@ export default function Home() {
       console.error("Error deleting video:", err);
       setAlertDialog({
         isOpen: true,
-        message: err instanceof Error ? err.message : "Không thể xóa video",
+        message: err instanceof Error ? err.message : t("deleteVideoError"),
       });
     }
   }
@@ -321,24 +312,23 @@ export default function Home() {
         {/* Main Content - 7 columns */}
         <main className="relative col-span-7 flex flex-col gap-12 overflow-y-auto px-4 py-16 sm:px-10 lg:px-14">
         <header className="flex flex-col gap-6 text-center lg:text-left">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm text-white/80 backdrop-blur lg:mx-0">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              Douyin Supreme Downloader · Không watermark · Free forever
+              <AnimatedText>{t("badge")}</AnimatedText>
             </div>
+            <LanguageSwitcher />
           </div>
           <div className="space-y-4">
             <h1 className="text-4xl font-semibold leading-tight text-slate-50 sm:text-5xl lg:text-6xl">
-              Tải video Douyin{" "}
-              <span className={`bg-linear-to-r ${ACCENT_GRADIENT} bg-clip-text text-transparent`}>
-                chất lượng tối đa
-              </span>{" "}
-              trong vài giây.
+              <AnimatedText>{t("title")}</AnimatedText>{" "}
+              <AnimatedText className={`bg-linear-to-r ${ACCENT_GRADIENT} bg-clip-text text-transparent`}>
+                {t("titleHighlight")}
+              </AnimatedText>{" "}
+              <AnimatedText>{t("titleSuffix")}</AnimatedText>
             </h1>
             <p className="text-lg text-slate-200 sm:text-xl">
-              Chỉ cần dán link Douyin (short URL cũng được), hệ thống sẽ tự động
-              gỡ watermark, chọn bitrate cao nhất và trả về file MP4 siêu nét cho
-              bạn.
+              <AnimatedText>{t("description")}</AnimatedText>
             </p>
           </div>
         </header>
@@ -348,7 +338,7 @@ export default function Home() {
             <div className="h-full rounded-[22px] border border-white/10 bg-black/50 p-8 shadow-2xl backdrop-blur">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-sm uppercase tracking-[0.3em] text-white/60">
-                  Trạng thái
+                  <AnimatedText>{t("statusReady")}</AnimatedText>
                 </span>
                 <div className="flex items-center gap-2">
                   <span
@@ -369,7 +359,7 @@ export default function Home() {
                             : "bg-amber-300"
                       } animate-pulse`}
                     />
-                    {statusBadge}
+                    <AnimatedText>{statusBadge}</AnimatedText>
                   </span>
                   {platform && (
                     <span className="rounded-full bg-white/10 border border-white/20 px-2 py-1 text-xs uppercase text-white/80">
@@ -385,13 +375,13 @@ export default function Home() {
 
               <form className="mt-8 flex flex-col gap-4" onSubmit={handleSubmit}>
                 <label className="text-sm font-medium text-white/70">
-                  Link video (Douyin / TikTok / Facebook)
+                  <AnimatedText>{t("inputLabel")}</AnimatedText>
                 </label>
                 <div className="relative rounded-2xl border border-white/15 bg-white/5 shadow-lg shadow-black/30">
                   <input
                     type="text"
                     inputMode="url"
-                    placeholder="https://v.douyin.com/... hoặc tiktok.com/... hoặc facebook.com/..."
+                    placeholder={t("inputPlaceholder")}
                     value={link}
                     onChange={(event) => {
                       setLink(event.target.value);
@@ -401,7 +391,7 @@ export default function Home() {
                     className="w-full rounded-2xl border border-transparent bg-transparent px-5 py-4 text-base text-white placeholder:text-white/40 focus:outline-none"
                   />
                   <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center gap-2 text-sm text-white/40">
-                    <span>Không watermark</span>
+                    <span>{t("noWatermark")}</span>
                   </div>
                 </div>
 
@@ -413,7 +403,7 @@ export default function Home() {
                       onClick={() => handleSampleFill(sample)}
                       className="rounded-full border border-white/15 px-4 py-2 text-white/80 transition hover:border-white/30 hover:text-white"
                     >
-                      {sample.platform === "douyin" ? "Douyin" : sample.platform === "tiktok" ? "TikTok" : "Facebook"} mẫu
+                      {sample.platform === "douyin" ? t("sampleDouyin") : sample.platform === "tiktok" ? t("sampleTiktok") : t("sampleFacebook")}
                     </button>
                   ))}
                 </div>
@@ -427,11 +417,11 @@ export default function Home() {
                     {status === "loading" ? (
                       <>
                         <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900 border-t-transparent text-white" />
-                        Đang xử lý...
+                        {t("processing")}
                       </>
                     ) : (
                       <>
-                        Tải ngay
+                        <AnimatedText>{t("downloadButton")}</AnimatedText>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 24 24"
@@ -452,33 +442,31 @@ export default function Home() {
           <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-1">
             <div className="rounded-[22px] border border-white/10 bg-linear-to-br from-white/10 to-transparent p-6 text-sm text-white/80 shadow-[0_20px_80px_-40px_rgba(15,23,42,1)] backdrop-blur">
               <h3 className="text-base font-semibold text-white">
-                Vì sao Douyin Supreme khác biệt?
+                <AnimatedText>{t("whyDifferent")}</AnimatedText>
               </h3>
               <ul className="mt-4 space-y-3">
                 <li className="flex items-start gap-3">
                   <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400" />
-                  Gỡ watermark trực tiếp từ nguồn chính thức Douyin, chọn bitrate
-                  cao nhất (lên tới 1080p/4K tuỳ video).
+                  <AnimatedText>{t("feature1")}</AnimatedText>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1 h-2 w-2 rounded-full bg-sky-400" />
-                  Tự nhận diện link rút gọn v.douyin.com và link app nội địa,
-                  không cần cài thêm gì.
+                  <AnimatedText>{t("feature2")}</AnimatedText>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1 h-2 w-2 rounded-full bg-rose-400" />
-                  UI chuẩn &ldquo;neo-brutalist&rdquo; hiện đại, tối ưu cho desktop & mobile.
+                  <AnimatedText>{t("feature3")}</AnimatedText>
                 </li>
               </ul>
             </div>
             <div className="rounded-[22px] border border-white/10 bg-black/60 p-6 text-sm text-white/80 backdrop-blur">
               <h3 className="text-base font-semibold text-white">
-                Tips để tải siêu nhanh
+                <AnimatedText>{t("tipsTitle")}</AnimatedText>
               </h3>
               <div className="mt-4 space-y-3">
-                <p>• Copy link chia sẻ trong Douyin & dán vào ô phía trái.</p>
-                <p>• Ưu tiên Wi-Fi để tải các video trên 200MB.</p>
-                <p>• Bookmark trang này để không bao giờ lo watermark nữa.</p>
+                <p>• <AnimatedText>{t("tip1")}</AnimatedText></p>
+                <p>• <AnimatedText>{t("tip2")}</AnimatedText></p>
+                <p>• <AnimatedText>{t("tip3")}</AnimatedText></p>
               </div>
             </div>
           </div>
@@ -489,28 +477,33 @@ export default function Home() {
             <div className="grid gap-8 lg:grid-cols-2">
               <div className="order-2 space-y-6 text-white/80 lg:order-1">
                 <h2 className="text-3xl font-semibold text-white">
-                  Hướng dẫn lấy link Douyin cực nhanh
+                  <AnimatedText>{t("guideStep1Title").replace("1. ", "")}</AnimatedText> - <AnimatedText>{t("guideStep3Title").replace("3. ", "")}</AnimatedText>
                 </h2>
                 <p>
-                  Video nào cũng có thể tải, chỉ cần làm đúng 3 bước này trong app
-                  Douyin. Mất chưa tới 5 giây!
+                  <AnimatedText>{t("description")}</AnimatedText>
                 </p>
                 <ol className="space-y-4">
-                  {GUIDE_STEPS.map((step) => (
-                    <li
-                      key={step.title}
-                      className="rounded-2xl border border-white/10 bg-white/5 p-4"
-                    >
-                      <p className="text-sm font-semibold text-white">
-                        {step.title}
-                      </p>
-                      <p className="text-white/70">{step.detail}</p>
-                    </li>
-                  ))}
+                  <li className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-sm font-semibold text-white">
+                      <AnimatedText>{t("guideStep1Title")}</AnimatedText>
+                    </p>
+                    <p className="text-white/70"><AnimatedText>{t("guideStep1Detail")}</AnimatedText></p>
+                  </li>
+                  <li className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-sm font-semibold text-white">
+                      <AnimatedText>{t("guideStep2Title")}</AnimatedText>
+                    </p>
+                    <p className="text-white/70"><AnimatedText>{t("guideStep2Detail")}</AnimatedText></p>
+                  </li>
+                  <li className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-sm font-semibold text-white">
+                      <AnimatedText>{t("guideStep3Title")}</AnimatedText>
+                    </p>
+                    <p className="text-white/70"><AnimatedText>{t("guideStep3Detail")}</AnimatedText></p>
+                  </li>
                 </ol>
                 <p className="text-sm text-white/60">
-                  Mẹo: Nếu link quá dài, bạn có thể dùng link rút gọn v.douyin.com,
-                  hệ thống vẫn nhận diện chính xác.
+                  {t("inputPlaceholder")}
                 </p>
               </div>
 
@@ -528,13 +521,13 @@ export default function Home() {
           {/* Header */}
           <div className="shrink-0 border-b border-white/10 bg-black/50 px-6 py-4">
             <h2 className="text-lg font-semibold text-white">
-              Lịch sử{" "}
-              <span className={`bg-linear-to-r ${ACCENT_GRADIENT} bg-clip-text text-transparent`}>
-                Video
-              </span>
+              <AnimatedText>{t("historyTitle")}</AnimatedText>{" "}
+              <AnimatedText className={`bg-linear-to-r ${ACCENT_GRADIENT} bg-clip-text text-transparent`}>
+                {t("historyVideo")}
+              </AnimatedText>
             </h2>
             <p className="mt-1 text-xs text-white/60">
-              {history.length} video đã phân tích
+              {history.length} {t("historyAnalyzed")}
             </p>
           </div>
 
@@ -543,7 +536,7 @@ export default function Home() {
             {historyLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                <span className="ml-3 text-sm text-white/70">Đang tải...</span>
+                <span className="ml-3 text-sm text-white/70">{t("historyLoading")}</span>
               </div>
             ) : historyError ? (
               <div className="py-12 text-center">
@@ -552,12 +545,12 @@ export default function Home() {
                   onClick={loadHistory}
                   className="mt-4 rounded-xl border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/80 transition hover:bg-white/10"
                 >
-                  Thử lại
+                  {t("retry")}
                 </button>
               </div>
             ) : history.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-sm text-white/60">Chưa có video nào</p>
+                <p className="text-sm text-white/60">{t("historyEmpty")}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -586,7 +579,7 @@ export default function Home() {
         <button
           onClick={() => setIsDrawerOpen(true)}
           className="fixed bottom-6 right-6 z-30 flex items-center gap-3 rounded-full border border-white/20 bg-linear-to-r from-fuchsia-500/90 to-rose-500/90 px-5 py-3 text-white shadow-lg backdrop-blur transition-all hover:scale-105 hover:shadow-xl active:scale-95"
-          aria-label="Xem kết quả phân tích"
+          aria-label={t("viewAnalysisResult")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -602,7 +595,7 @@ export default function Home() {
             <path d="M21 15l-9 9-9-9" />
             <path d="M12 3v18" />
           </svg>
-          <span className="text-sm font-medium">Kết quả phân tích</span>
+          <span className="text-sm font-medium">{t("analysisResult")}</span>
         </button>
       )}
 
@@ -641,26 +634,26 @@ export default function Home() {
       <Dialog
         isOpen={deleteDialog.isOpen}
         onClose={() => setDeleteDialog({ isOpen: false, item: null })}
-        title="Xóa video khỏi lịch sử"
+        title={t("historyDelete")}
         message={
           deleteDialog.item
-            ? `Bạn có chắc muốn xóa video "${deleteDialog.item.result.description || deleteDialog.item.result.videoId}" khỏi lịch sử?`
+            ? `${t("historyDeleteConfirm")} "${deleteDialog.item.result.description || deleteDialog.item.result.videoId}"?`
             : ""
         }
         type="confirm"
         onConfirm={handleHistoryDelete}
-        confirmText="Xóa"
-        cancelText="Hủy"
+        confirmText={t("historyDelete")}
+        cancelText={t("cancel")}
       />
 
       {/* Alert Dialog */}
       <Dialog
         isOpen={alertDialog.isOpen}
         onClose={() => setAlertDialog({ isOpen: false, message: "" })}
-        title="Thông báo"
+        title={t("close")}
         message={alertDialog.message}
         type="alert"
-        confirmText="Đóng"
+        confirmText={t("close")}
       />
     </div>
   );
@@ -688,6 +681,7 @@ function extractShareUrl(value: string) {
 }
 
 function LinkGuideCanvas() {
+  const { t } = useI18n();
   return (
     <div className="relative overflow-hidden rounded-[32px] border border-white/15 bg-linear-to-br from-fuchsia-500/20 via-indigo-600/10 to-black/90 p-8 shadow-[0_25px_100px_-40px_rgba(13,148,136,1)]">
       <div className="absolute inset-x-10 top-10 h-52 rounded-full bg-amber-400/10 blur-3xl" />
@@ -702,7 +696,7 @@ function LinkGuideCanvas() {
             </div>
             <div className="rounded-2xl border border-white/15 bg-white/5 p-3">
               <div className="mb-2 flex items-center justify-between text-xs">
-                <span className="text-white/70">Chia sẻ</span>
+                <span className="text-white/70">{t("share")}</span>
                 <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-300">
                   Copy Link
                 </span>
@@ -715,7 +709,7 @@ function LinkGuideCanvas() {
           </div>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center text-sm text-white/80">
-          Minh hoạ thao tác: mở video → nhấn Chia sẻ → Copy Link.
+          {t("guideIllustration")}
         </div>
       </div>
     </div>
@@ -739,6 +733,7 @@ function AnalysisDrawer({
   sizeLabel,
   processedLabel,
 }: AnalysisDrawerProps) {
+  const { t } = useI18n();
   const [isMounted, setIsMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -802,16 +797,16 @@ function AnalysisDrawer({
         <div className="shrink-0 flex items-center justify-between border-b border-white/10 bg-black/80 px-6 py-4 backdrop-blur">
           <div className="min-w-0 flex-1 pr-4">
             <p className="text-sm uppercase tracking-[0.3em] text-white/60 truncate">
-              Kết quả phân tích
+              {t("analysisResult")}
             </p>
             <h2 className="mt-1 text-xl font-semibold text-white truncate">
-              {result.description || "Video Douyin không watermark"}
+              {result.description || t("videoNoWatermark")}
             </h2>
           </div>
           <button
             onClick={onClose}
             className="shrink-0 rounded-full border border-white/20 bg-white/5 p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
-            aria-label="Đóng drawer"
+            aria-label={t("closeDrawer")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -836,22 +831,22 @@ function AnalysisDrawer({
             isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}>
             <p className="text-xs text-white/70 mb-3 truncate">
-              Tác giả: <span className="text-white font-medium">{result.author}</span> · Nhạc:{" "}
-              <span className="text-white font-medium">{result.music ?? "Không xác định"}</span>
+              {t("author")}: <span className="text-white font-medium">{result.author}</span> · {t("music")}:{" "}
+              <span className="text-white font-medium">{result.music ?? t("unknown")}</span>
             </p>
 
             <div className="grid grid-cols-2 gap-2">
-              <Metric label="Độ phân giải" value={result.resolution ?? "—"} />
-              <Metric label="Thời lượng" value={durationLabel} />
+              <Metric label={t("resolution")} value={result.resolution ?? "—"} />
+              <Metric label={t("duration")} value={durationLabel} />
               <Metric
-                label="Bitrate"
+                label={t("bitrate")}
                 value={
                   result.bitrateKbps
                     ? `${Math.round(result.bitrateKbps)} kbps`
                     : "—"
                 }
               />
-              <Metric label="Dung lượng" value={sizeLabel} />
+              <Metric label={t("size")} value={sizeLabel} />
             </div>
           </div>
 
@@ -893,12 +888,11 @@ function AnalysisDrawer({
                 <path d="M12 3v12.586l3.293-3.293 1.414 1.414L12 18.414l-4.707-4.707 1.414-1.414L11 15.586V3h2z" />
                 <path d="M5 20h14v2H5z" />
               </svg>
-              Tải file MP4 không watermark
+              {t("downloadMp4")}
             </a>
             
             <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/70">
-              Đã xử lý: {processedLabel ?? "—"}. Link tải chỉ sử dụng nguồn
-              chính thức từ Douyin, an toàn và riêng tư.
+              {t("processedAt")} {processedLabel ?? "—"}. {t("processedInfo")}
             </div>
           </div>
         </div>
@@ -922,6 +916,7 @@ function HistorySidebarCard({
   formatDate,
   formatDuration,
 }: HistorySidebarCardProps) {
+  const { t } = useI18n();
   const { result, accessedAt } = item;
 
   return (
@@ -980,8 +975,8 @@ function HistorySidebarCard({
               <button
                 onClick={onDelete}
                 className="shrink-0 rounded-lg border border-rose-500/30 bg-rose-500/10 p-1.5 text-rose-300 transition hover:bg-rose-500/20"
-                title="Xóa"
-                aria-label="Xóa video"
+                title={t("historyDelete")}
+                aria-label={t("deleteVideo")}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1021,6 +1016,7 @@ function HistoryVideoDrawer({
   formatSize,
   formatDuration,
 }: HistoryVideoDrawerProps) {
+  const { t } = useI18n();
   const { result } = item;
   const [isMounted, setIsMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -1081,16 +1077,16 @@ function HistoryVideoDrawer({
           <div className="shrink-0 flex items-center justify-between border-b border-white/10 bg-black/80 px-6 py-4 backdrop-blur">
             <div className="min-w-0 flex-1 pr-4">
               <p className="text-sm uppercase tracking-[0.3em] text-white/60">
-                Chi tiết video
+                {t("videoDetails")}
               </p>
               <h2 className="mt-1 text-xl font-semibold text-white truncate">
-                {result.description || "Video không có mô tả"}
+                {result.description || t("noDescription")}
               </h2>
             </div>
             <button
               onClick={onClose}
               className="shrink-0 rounded-full border border-white/20 bg-white/5 p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
-              aria-label="Đóng drawer"
+              aria-label={t("closeDrawer")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1114,41 +1110,41 @@ function HistoryVideoDrawer({
               isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}>
               <h3 className="mb-3 text-sm font-semibold text-white">
-                Thông tin video
+                {t("videoInfo")}
               </h3>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-xs text-white/50">Tác giả</p>
+                  <p className="text-xs text-white/50">{t("author")}</p>
                   <p className="mt-1 text-sm font-medium text-white">
                     {result.author}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-white/50">Nền tảng</p>
+                  <p className="text-xs text-white/50">{t("platform")}</p>
                   <p className="mt-1 text-sm font-medium text-white">
                     {PLATFORM_LABELS[result.platform]}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-white/50">Độ phân giải</p>
+                  <p className="text-xs text-white/50">{t("resolution")}</p>
                   <p className="mt-1 text-sm font-medium text-white">
                     {result.resolution || "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-white/50">Thời lượng</p>
+                  <p className="text-xs text-white/50">{t("duration")}</p>
                   <p className="mt-1 text-sm font-medium text-white">
                     {formatDuration(result.duration)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-white/50">Dung lượng</p>
+                  <p className="text-xs text-white/50">{t("size")}</p>
                   <p className="mt-1 text-sm font-medium text-white">
                     {formatSize(result.sizeBytes)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-white/50">Bitrate</p>
+                  <p className="text-xs text-white/50">{t("bitrate")}</p>
                   <p className="mt-1 text-sm font-medium text-white">
                     {result.bitrateKbps
                       ? `${Math.round(result.bitrateKbps)} kbps`
@@ -1193,7 +1189,7 @@ function HistoryVideoDrawer({
                   <path d="M12 3v12.586l3.293-3.293 1.414 1.414L12 18.414l-4.707-4.707 1.414-1.414L11 15.586V3h2z" />
                   <path d="M5 20h14v2H5z" />
                 </svg>
-                Tải file MP4 không watermark
+                {t("downloadMp4")}
               </a>
               
               {onDelete && (
@@ -1213,7 +1209,7 @@ function HistoryVideoDrawer({
                   >
                     <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
-                  Xóa khỏi lịch sử
+                  {t("historyDelete")}
                 </button>
               )}
             </div>
